@@ -58,6 +58,7 @@ spec:
         class_name: LGBMModel
         class_args:
           model_path: store://artifacts/nyc-taxi-remote-gilad/train_model_FareModel:1859b6d39608489ab831850ab0d7f6be
+  model_file: FareModel.pkl
   default_class: LGBMModel
   secret_sources: []
   affinity: null
