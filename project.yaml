@@ -1,0 +1,101 @@
+kind: project
+metadata:
+  name: nyc-taxi-remote-gilad
+  created: '2022-05-24T15:13:03.906000+00:00'
+spec:
+  functions:
+  - url: taxi.py
+    name: taxi
+    kind: job
+    image: mlrun/mlrun
+    with_repo: true
+    requirements:
+    - lightgbm
+    - shapely
+  - url: nuclio-function.py
+    name: last_drive
+    kind: nuclio
+    image: mlrun/mlrun
+    handler: nuclio-function:handler
+    with_repo: true
+  - url: serving.yaml
+    name: model-serving
+    with_repo: true
+  workflows:
+  - name: main
+    code: "from kfp import dsl\nfrom mlrun.platforms import auto_mount\nimport os\n\
+      import sys\nimport mlrun\n\nfuncs = {}\n\n# init functions is used to configure\
+      \ function resources and local settings\ndef init_functions(functions: dict,\
+      \ project=None, secrets=None):\n    for f in functions.values():\n        f.apply(auto_mount())\n\
+      \n@dsl.pipeline(\n    name=\"NYC Taxi Demo\",\n    description=\"Convert ML\
+      \ script to MLRun\"\n)\n\ndef kfpipeline():\n\n    taxi_records_csv_path = mlrun.get_sample_path('data/Taxi/yellow_tripdata_2019-01_subset.csv')\n\
+      \    zones_csv_path = mlrun.get_sample_path('data/Taxi/taxi_zones.csv')\n  \
+      \  \n    # build our ingestion function (container image)\n    builder = funcs['taxi'].deploy_step(skip_deployed=True)\n\
+      \    \n    # run the ingestion function with the new image and params\n    ingest\
+      \ = funcs['taxi'].as_step(\n        name=\"fetch_data\",\n        handler='fetch_data',\n\
+      \        image=builder.outputs['image'],\n        inputs={'taxi_records_csv_path':\
+      \ taxi_records_csv_path,\n                'zones_csv_path': zones_csv_path},\n\
+      \        outputs=['nyc-taxi-dataset', 'zones-dataset'])\n\n    # Join and transform\
+      \ the data sets \n    transform = funcs[\"taxi\"].as_step(\n        name=\"\
+      transform_dataset\",\n        handler='transform_dataset',\n        inputs={\"\
+      taxi_records_csv_path\": ingest.outputs['nyc-taxi-dataset'],\n             \
+      \   \"zones_csv_path\" : ingest.outputs['zones-dataset']},\n        outputs=['nyc-taxi-dataset-transformed'])\n\
+      \n    # Train the model\n    train = funcs[\"taxi\"].as_step(\n        name=\"\
+      train\",\n        handler=\"train_model\",\n        inputs={\"input_ds\" : transform.outputs['nyc-taxi-dataset-transformed']},\n\
+      \        outputs=['FareModel'])\n    \n    # Deploy the model\n    deploy =\
+      \ funcs[\"model-serving\"].deploy_step(models={\"taxi-serving_v1\": train.outputs['FareModel']},\
+      \ tag='v2')"
+    engine: null
+  artifacts:
+  - kind: dataset
+    metadata:
+      project: nyc-taxi-remote-gilad
+      key: nyc-taxi-dataset
+    spec:
+      target_path: s3://mlrun-v1-warroom/nyc-taxi-dataset.csv
+      format: ''
+    status:
+      state: created
+  - kind: dataset
+    metadata:
+      project: nyc-taxi-remote-gilad
+      key: zones-dataset
+    spec:
+      target_path: s3://mlrun-v1-warroom/zones-dataset.csv
+      format: ''
+    status:
+      state: created
+  - kind: dataset
+    metadata:
+      project: nyc-taxi-remote-gilad
+      key: yc-taxi-dataset-transformed
+    spec:
+      target_path: s3://mlrun-v1-warroom/nyc-taxi-dataset-transformed.csv
+      format: ''
+    status:
+      state: created
+  - kind: dataset
+    metadata:
+      project: nyc-taxi-remote-gilad
+      key: nyc-taxi-dataset-transformed
+    spec:
+      target_path: s3://mlrun-v1-warroom/nyc-taxi-dataset-transformed.csv
+      format: ''
+    status:
+      state: created
+  - kind: model
+    metadata:
+      project: nyc-taxi-remote-gilad
+      key: FareModel
+    spec:
+      target_path: s3://mlrun-v1-warroom/FareModel
+    status:
+      state: created
+  source: git://github.com/GiladShapira94/remote-project.git#refs/heads/master
+  subpath: ''
+  origin_url: git://Giladshapira94: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@github.com/GiladShapira94/load_project.git#refs/heads/master
+  desired_state: online
+  owner: Gilad
+  disable_auto_mount: false
+status:
+  state: online
