@@ -8,7 +8,6 @@ spec:
     name: taxi
     kind: job
     image: mlrun/mlrun
-    with_repo: true
     requirements:
     - lightgbm
     - shapely
@@ -17,10 +16,8 @@ spec:
     kind: nuclio
     image: mlrun/mlrun
     handler: nuclio-function:handler
-    with_repo: true
   - url: serving.yaml
     name: model-serving
-    with_repo: true
   workflows:
   - name: main
     code: "from kfp import dsl\nfrom mlrun.platforms import auto_mount\nimport os\n\
@@ -89,13 +86,13 @@ spec:
       project: nyc-taxi-remote-gilad
       key: FareModel
     spec:
-      target_path: s3://mlrun-v1-warroom/FareModel.pkl
+      target_path: s3://mlrun-v1-warroom/
       model_file: FareModel.pkl
     status:
       state: created
-  source: git://Giladshapira94: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@github.com/GiladShapira94/remote-project.git#refs/heads/master
+  source: git://Giladhapira94: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@github.com/GiladShapira94/remote-project.git#refs/heads/master
   subpath: ''
-  origin_url: git://Giladshapira94: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@github.com/GiladShapira94/remote-project.git#refs/heads/master
+  origin_url: git://Giladhapira94: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@github.com/GiladShapira94/remote-project.git#refs/heads/master
   desired_state: online
   owner: Gilad
   disable_auto_mount: false
