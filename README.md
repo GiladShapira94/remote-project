@@ -131,7 +131,10 @@ Need to define artifact object (other attributes can be define and will ovrite t
 project.set_artifact(key='training_model',artifact='<artifact object>',target_path='<target path>')#model artifacts
 ````
 * This option allow to define which artifact object it related to.
-
+**Tip -** You can get your artifact object usine get_store_resource method, example:
+````
+project.get_store_resource(<store uri>)
+````
 ### Set worfklow - [link to function documentation](https://docs.mlrun.org/en/latest/api/mlrun.projects.html?highlight=set_workflow#mlrun.projects.MlrunProject.set_workflow)
 Save workflow python file to Project YAML, Example:
 * **Parameters  -**
