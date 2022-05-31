@@ -1,7 +1,4 @@
 # How To Load Project From Cluster A To Cluster B
-**mlrun-code-source -** example how to run a project with remote storage, save a project YAML and pushed to GitHub on Cluster A.
-
-**mlrun-code-target -** example how to load same project on Cluster B.
 
 #### prerequisite - 
 * Git - 
