@@ -93,9 +93,9 @@ spec:
       model_file: FareModel.pkl
     status:
       state: created
-  source: https://Giladhapira94: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@github.com/GiladShapira94/remote-project.git
+  source: []
   subpath: ''
-  origin_url: https://Giladhapira94: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@github.com/GiladShapira94/remote-project.git
+  origin_url: []
   desired_state: online
   owner: Gilad
   disable_auto_mount: false
